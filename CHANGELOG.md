@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.6.0 (January 21st, 2020)
+
+- Drop support for Moodle older than 3.6
+
 ## 3.4.2 (May 19, 2019)
 
 - Minor code cleanup and internal documentation fixes
