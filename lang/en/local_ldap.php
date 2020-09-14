@@ -50,3 +50,7 @@ $string['synccohortattribute_info'] = '';
 $string['synccohortattribute'] = 'Sync Moodle\'s cohorts with LDAP attribute';
 $string['synccohortgroup_info'] = '';
 $string['synccohortgroup'] = 'Sync Moodle\'s cohorts with LDAP groups';
+$string['group_filter'] = 'Group LDAP-filter';
+$string['group_filter_desc'] = 'Define LDAP-filter to narrow down LDAP groups';
+$string['group_context'] = 'Additional group-ou\'s';
+$string['group_context_desc'] = 'Define additional paths for your groupsearch. (seperated by ";".)';

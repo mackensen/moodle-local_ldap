@@ -40,7 +40,7 @@ class local_ldap extends auth_plugin_ldap {
     /** @var array Avoid infinite loop with nested groups in 'funny' directories. */
     private $antirecursionarray;
 
-    /** @vary array Cache for found group dns. */
+    /** @var array Cache for found group dns. */
     private $groupdnscache;
 
     /**
@@ -68,6 +68,8 @@ class local_ldap extends auth_plugin_ldap {
         $extra = get_config('local_ldap');
         $this->merge_config($extra, 'group_attribute', 'cn');
         $this->merge_config($extra, 'group_class', 'groupOfNames');
+        $this->merge_config($extra, 'group_filter', '*');
+        $this->merge_config($extra, 'group_context', '');
         $this->merge_config($extra, 'process_nested_groups', 0);
         $this->merge_config($extra, 'cohort_synching_ldap_attribute_attribute', 'eduPersonAffiliation');
         $this->merge_config($extra, 'cohort_synching_ldap_attribute_idnumbers', '');
@@ -125,8 +127,8 @@ class local_ldap extends auth_plugin_ldap {
             $filter = "(&(" . $this->config->group_attribute . "=*)(objectclass=" . $this->config->group_class . "))";
         }
 
-        if (!empty($CFG->cohort_synching_ldap_groups_contexts)) {
-            $contexts = explode(';', $CFG->cohort_synching_ldap_groups_contexts);
+        if (!empty($this->config->group_context)) {
+            $contexts = array_merge(explode(';', $this->config->group_context), explode(';', $this->config->contexts));
         } else {
             $contexts = explode(';', $this->config->contexts);
         }
@@ -198,8 +200,8 @@ class local_ldap extends auth_plugin_ldap {
 
         $queryg = "(&({$this->config->group_attribute}=" . ldap_filter_addslashes(trim($group)) . ")(objectClass={$this->config->group_class}))";
 
-        if (!empty($CFG->cohort_synching_ldap_groups_contexts)) {
-            $contexts = explode(';', $CFG->cohort_synching_ldap_groups_contexts);
+        if (!empty($this->config->group_context)) {
+            $contexts = array_merge(explode(';', $this->config->group_context), explode(';', $this->config->contexts));
         } else {
             $contexts = explode(';', $this->config->contexts);
         }
@@ -296,8 +298,8 @@ class local_ldap extends auth_plugin_ldap {
 
         $size = 999;
 
-        if (!empty($CFG->cohort_synching_ldap_groups_contexts)) {
-            $contexts = explode(';', $CFG->cohort_synching_ldap_groups_contexts);
+        if (!empty($this->config->group_context)) {
+            $contexts = array_merge(explode(';', $this->config->group_context), explode(';', $this->config->contexts));
         } else {
             $contexts = explode(';', $this->config->contexts);
         }
@@ -675,7 +677,16 @@ class local_ldap extends auth_plugin_ldap {
     public function sync_cohorts_by_group() {
         global $DB;
 
-        $ldapgroups = $this->ldap_get_grouplist();
+        $filter = '';
+        if($this->config->group_filter != '' || $this->config->group_filter !== '*') {
+            $filter = $this->config->group_filter;
+        }
+
+        if($this->config->group_filter === '') {
+            $filter = '*';
+        }
+
+        $ldapgroups = $this->ldap_get_grouplist($filter);
         foreach ($ldapgroups as $groupname) {
             if (!$cohort = $DB->get_record('cohort', array('idnumber' => $groupname), '*')) {
                 if (empty($this->config->cohort_synching_ldap_groups_autocreate_cohorts)) {

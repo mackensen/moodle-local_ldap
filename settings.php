@@ -49,6 +49,18 @@ if ($hassiteconfig) {
     $setting = new admin_setting_configtext('local_ldap/'.$name, $title, $description, '');
     $settings->add($setting);
 
+    $name = 'group_filter';
+    $title = get_string($name, 'local_ldap');
+    $description = get_string($name . '_desc', 'local_ldap');
+    $setting = new admin_setting_configtext('local_ldap/'.$name, $title, $description, '*');
+    $settings->add($setting);
+
+    $name = 'group_context';
+    $title = get_string($name, 'local_ldap');
+    $description = get_string($name . '_desc', 'local_ldap');
+    $setting = new admin_setting_configtext('local_ldap/'.$name, $title, $description, '');
+    $settings->add($setting);
+
     $name = 'process_nested_groups';
     $title = get_string($name, 'local_ldap');
     $description = get_string($name.'_desc', 'local_ldap');
