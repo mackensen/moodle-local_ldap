@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Update pagination for PHP 7.4
 - Change default branch to "main"
 - Update CI tool to version 3
 - Dropped support for Moodle 3.6
