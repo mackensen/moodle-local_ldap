@@ -534,9 +534,20 @@ class local_ldap_sync_testcase extends advanced_testcase {
                 $ldappagedresults = ldap_paged_results_supported(3, $ldapconnection);
                 $ldapcookie = '';
                 $todelete = array();
+                $servercontrols = array();
                 do {
                     if ($ldappagedresults) {
-                        ldap_control_paged_result($ldapconnection, 250, true, $ldapcookie);
+                        if (version_compare(PHP_VERSION, '7.3.0', '<')) {
+                            ldap_control_paged_result($ldapconnection, 250, true, $ldapcookie);
+                        } else {
+                            $servercontrols = array(
+                                array(
+                                    'oid' => LDAP_CONTROL_PAGEDRESULTS, 'value' => array(
+                                        'size' => 250, 'cookie' => $ldapcookie
+                                    )
+                                )
+                            );
+                        }
                     }
                     $res = ldap_search($ldapconnection, "$filter,$dn", 'cn=*', array('dn'));
                     if (!$res) {
@@ -549,7 +560,19 @@ class local_ldap_sync_testcase extends advanced_testcase {
                         }
                     }
                     if ($ldappagedresults) {
-                        ldap_control_paged_result_response($ldapconnection, $res, $ldapcookie);
+                        $ldapcookie = '';
+                        if (version_compare(PHP_VERSION, '7.3.0', '<')) {
+                            $pagedresp = ldap_control_paged_result_response($ldapconnection, $res, $ldapcookie);
+                            if ($pagedresp === false) {
+                                $ldapcookie = null;
+                            }
+                        } else {
+                            ldap_parse_result($ldapconnection, $res, $errcode, $matcheddn,
+                                $errmsg, $referrals, $controls);
+                            if (isset($controls[LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'])) {
+                                $ldapcookie = $controls[LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'];
+                            }
+                        }
                     }
                     ldap_free_result($res);
                 } while ($ldappagedresults && $ldapcookie !== null && $ldapcookie != '');
@@ -568,7 +591,17 @@ class local_ldap_sync_testcase extends advanced_testcase {
 
                 do {
                     if ($ldappagedresults) {
-                        ldap_control_paged_result($ldapconnection, 250, true, $ldapcookie);
+                        if (version_compare(PHP_VERSION, '7.3.0', '<')) {
+                            ldap_control_paged_result($ldapconnection, 250, true, $ldapcookie);
+                        } else {
+                            $servercontrols = array(
+                                array(
+                                    'oid' => LDAP_CONTROL_PAGEDRESULTS, 'value' => array(
+                                        'size' => 250, 'cookie' => $ldapcookie
+                                    )
+                                )
+                            );
+                        }
                     }
                     $res = ldap_search($ldapconnection, "$filter,$dn", 'ou=*', array('dn'));
                     if (!$res) {
@@ -581,7 +614,19 @@ class local_ldap_sync_testcase extends advanced_testcase {
                         }
                     }
                     if ($ldappagedresults) {
-                        ldap_control_paged_result_response($ldapconnection, $res, $ldapcookie);
+                        $ldapcookie = '';
+                        if (version_compare(PHP_VERSION, '7.3.0', '<')) {
+                            $pagedresp = ldap_control_paged_result_response($ldapconnection, $res, $ldapcookie);
+                            if ($pagedresp === false) {
+                                $ldapcookie = null;
+                            }
+                        } else {
+                            ldap_parse_result($ldapconnection, $res, $errcode, $matcheddn,
+                                $errmsg, $referrals, $controls);
+                            if (isset($controls[LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'])) {
+                                $ldapcookie = $controls[LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'];
+                            }
+                        }
                     }
                     ldap_free_result($res);
                 } while ($ldappagedresults && $ldapcookie !== null && $ldapcookie != '');
