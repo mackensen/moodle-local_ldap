@@ -20,6 +20,7 @@ cache:
 env:
   global:
     - IGNORE_NAMES=sync_test.php
+    - CODECHECKER_IGNORE_PATHS=locallib.php
 
 matrix:
   include:
