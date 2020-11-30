@@ -47,15 +47,12 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
       ldap:
-        image: bitnami/openldap
+        image: osixia/openldap:1.4.0
         ports:
           - 3389:3389
         env:
-          LDAP_ADMIN_USERNAME: admin
-          LDAP_ADMIN_PASSWORD: password
-          LDAP_ROOT: dc=example,dc=com
-          LDAP_PORT_NUMBER: 3389
-          LDAP_CUSTOM_LDIF_DIR: /home/runner/work/moodle-local_ldap/moodle-local_ldap/moodle/local/ldap/tests/fixtures/bootstrap.ldif
+          LDAP_SEED_INTERNAL_LDIF_PATH: /home/runner/work/moodle-local_ldap/moodle-local_ldap/moodle/local/ldap/tests/fixtures/bootstrap.ldif
+          LDAP_SEED_INTERNAL_SCHEMA_PATH: /home/runner/work/moodle-local_ldap/moodle-local_ldap/moodle/local/ldap/tests/fixtures/slapd.conf
 
     steps:
       - name: Checkout
@@ -97,14 +94,6 @@ jobs:
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-version }}
-
-      - name: Install OpenLDAP
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y ldap-utils slapd
-          mkdir /tmp/slapd
-          slapd -f /home/runner/work/moodle-local_ldap/moodle-local_ldap/moodle/local/ldap/tests/fixtures/slapd.conf -h ldap://127.0.0.1:3389 &
-          sleep 5
-          ldapadd -H ldap://127.0.0.1:3389 -D "cn=admin,dc=example,dc=com" -w password -f /home/runner/work/moodle-local_ldap/moodle-local_ldap/moodle/local/ldap/tests/fixtures/bootstrap.ldif
 
       - name: phplint
         run: moodle-plugin-ci phplint
