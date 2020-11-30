@@ -89,7 +89,7 @@ jobs:
 
       - name: Install OpenLDAP
         run: |
-          sudo apt-get update -y && apt-get install -y ldap-utils slapd
+          sudo apt-get update -y && sudo apt-get install -y ldap-utils slapd
           mkdir /tmp/slapd
           slapd -f moodle/local/ldap/tests/fixtures/slapd.conf -h ldap://localhost:3389 &
           sleep 3
