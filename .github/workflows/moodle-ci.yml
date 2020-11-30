@@ -10,8 +10,8 @@ jobs:
   test:
     env:
       IGNORE_PATHS: tests/sync_test.php
-      CODECHECKER_IGNORE_PATHS: $IGNORE_PATHS,locallib.php
-      PHPCPD_IGNORE_PATHS: $IGNORE_PATHS,locallib.php
+      CODECHECKER_IGNORE_PATHS: tests/sync_test.php,locallib.php
+      PHPCPD_IGNORE_PATHS: tests/sync_test.php,locallib.php
     strategy:
       fail-fast: false
       matrix:
