@@ -6,6 +6,9 @@ on:
     branches: [ 'main' ]
   schedule:
     - cron: '0 8 * * 5'
+defaults:
+  run:
+    shell: bash -l {0}
 jobs:
   test:
     env:
@@ -19,11 +22,12 @@ jobs:
         moodle-version: ['MOODLE_37_STABLE', 'MOODLE_38_STABLE', 'MOODLE_39_STABLE', 'MOODLE_310_STABLE', 'master']
         operating-system: [ubuntu-latest]
         php-versions: ['7.4']
+        node-versions: ['14.15.0']
         exclude:
-          - {moodle-version: 'MOODLE_37_STABLE', php-versions: '7.4'}
+          - {moodle-version: 'MOODLE_37_STABLE', php-versions: '7.4', node-versions: '14.15.0'}
         include:
-          - {moodle-version: 'MOODLE_37_STABLE', php-versions: '7.1', operating-system: 'ubuntu-latest', database: 'mariadb'}
-          - {moodle-version: 'MOODLE_37_STABLE', php-versions: '7.1', operating-system: 'ubuntu-latest', database: 'pgsql'}
+          - {moodle-version: 'MOODLE_37_STABLE', php-versions: '7.1', node-versions: '14.15.0', operating-system: 'ubuntu-latest', database: 'mariadb'}
+          - {moodle-version: 'MOODLE_37_STABLE', php-versions: '7.1', node-versions: '14.15.0', operating-system: 'ubuntu-latest', database: 'pgsql'}
     runs-on: ${{ matrix.operating-system }}
     services:
       postgres:
@@ -63,10 +67,9 @@ jobs:
           path: plugin
 
       - name: Install node
-        uses: actions/setup-node@v1
-        with:
-          # TODO: Check if we can support .nvmrc
-          node-version: '14.15.0'
+        run: |
+          nvm install ${{ matrix.node-versions }}
+          nvm use ${{ matrix.node-versions }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
