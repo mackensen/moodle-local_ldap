@@ -61,7 +61,7 @@ jobs:
             LDAP_PORT_NUMBER: 3389
             LDAP_CUSTOM_SCHEMA_FILE: /schema/eduperson.schema
           volumes:
-            - tests/fixtures/eduperson.schema:/schema/eduperson.schema
+            - /$(pwd)/tests/fixtures/eduperson.schema:/schema/eduperson.schema
     steps:
       - name: Checkout
         uses: actions/checkout@v2
