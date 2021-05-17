@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.7.1 (May 17, 2021)
+
+- Prevent mass-unenrollment when a connection fails
+
 ## 3.7.0 (November 9, 2020)
 
 - Update pagination for PHP 7.4
